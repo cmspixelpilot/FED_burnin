@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <HwDescription>
     <AMC13>
-        <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T101:50001" address_table="file://settings/AMC13XG_T1.xml" />
-        <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=amc13T201:50001" address_table="file://settings/AMC13XG_T2.xml" />
-        <AMCmask enable="3,4,5,9,10" />
+        <connection id="T1" uri="chtcp-2.0://ctrl-s2c16-07-01:10203?target=amc-s1g03-13-13-T1:50001" address_table="file:///opt/cactus/etc/amc13/AMC13XG_T1.xml" />
+        <connection id="T2" uri="chtcp-2.0://ctrl-s2c16-07-01:10203?target=amc-s1g03-13-13-T2:50001" address_table="file:///opt/cactus/etc/amc13/AMC13XG_T2.xml" />
+        <AMCmask enable="3" />
         <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
@@ -15,23 +15,23 @@
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">
-        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
+        <connection id="board0" uri="chtcp-2.0://ctrl-s2c16-07-01:10203?target=amc-s1g03-13-03:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
-        <!--<Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>-->
+        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
         <!--<Register name="pixfed_ctrl_regs.INTERNAL_TRIG_EN">0</Register>-->
-        <Register name="pixfed_ctrl_regs.data_type">2</Register>
+        <Register name="pixfed_ctrl_regs.data_type">0</Register>
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFCFF</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFC30F</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
-        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
-        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />
+        <Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" Enable="7,8,10,11"/> <!-- FMC0: lower FMC, FMC1: upper FMC -->
+        <Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" />
         <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
         <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
     </PixFED>
@@ -40,10 +40,10 @@
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">0</Setting>
+    <Setting name="ChannelOfInterest">22</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
-    <Setting name="BlockSize">512</Setting>
+    <Setting name="BlockSize">1024</Setting>
     <!--if set to 0, loop will run forever-->
     <!--<Setting name="NAcq">100</Setting>-->
 </Settings>

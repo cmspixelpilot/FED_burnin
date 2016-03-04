@@ -18,25 +18,35 @@ int main(int argc, char* argv[] )
 
     const char* cHWFile = argv[1];
     std::cout << "HW Description File: " << cHWFile << std::endl;
+    bool use_amc13 = true;
+    bool phases_forever = false;
+
+    for (int i = 2; i < argc; ++i) {
+      const std::string a(argv[i]);
+      if (a == "noamc13")
+	use_amc13 = false;
+      else if (a == "phases")
+	phases_forever = true;
+    }
 
     uhal::setLogLevelTo(uhal::Debug());
 
     // instantiate System Controller
     SystemController cSystemController;
-    Amc13Controller  cAmc13Controller;
+    Amc13Controller cAmc13Controller;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
     cSystemController.InitializeSettings(cHWFile, std::cout);
 
     // initialize HWdescription from XML, beware, settings have to be read first
-    cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
+    if (use_amc13) cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
     cSystemController.InitializeHw(cHWFile, std::cout);
 
     // configure the HW
-    cAmc13Controller.ConfigureAmc13( std::cout );
+    if (use_amc13) cAmc13Controller.ConfigureAmc13( std::cout );
     cSystemController.ConfigureHw(std::cout );
 
-    cAmc13Controller.fAmc13Interface->StartL1A();
+    if (use_amc13) cAmc13Controller.fAmc13Interface->StartL1A();
 
     auto cSetting = cSystemController.fSettingsMap.find("NAcq");
     int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
@@ -60,15 +70,13 @@ int main(int argc, char* argv[] )
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
     }
 
-    //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
-    //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
-    //while (true)
-    //{
-        //for (auto& cFED : cSystemController.fPixFEDVector)
-        //{
-            //cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
-        //}
-    //}
+    if (phases_forever) {
+      std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
+      std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
+      while (true)
+        for (auto& cFED : cSystemController.fPixFEDVector)
+	  cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
+    }
 
     for (int i = 0; i < 11; i++)
     {
@@ -84,9 +92,9 @@ int main(int argc, char* argv[] )
          }
     }
     
-    cAmc13Controller.fAmc13Interface->StopL1A();
+    if (use_amc13) cAmc13Controller.fAmc13Interface->StopL1A();
 
 //    cSystemController.HaltHw();
-//    cAmc13Controller.HaltAmc13();
+//    if (use_amc13) cAmc13Controller.HaltAmc13();
     exit(0);
 }

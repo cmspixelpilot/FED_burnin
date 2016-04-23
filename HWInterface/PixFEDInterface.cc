@@ -103,6 +103,95 @@ std::vector<uint32_t> PixFEDInterface::ReadBlockBoardReg( PixFED * pFED, const s
 //FITEL METHODS
 /////////////////////////
 
+void PixFEDInterface::DumpFitelRegs(Fitel* pFitel) {
+  std::cout << "DumpFitelRegs:\n";
+
+  setBoard(pFitel->getBeId());
+
+  std::vector<uint32_t> xxx = {
+    0x0000,
+    0x0100,
+    0x0200,
+    0x0300,
+    0x0400,
+    0x0500,
+    0x0700,
+    0x3f00,
+    0x4000,
+    0x4100,
+    0x4200,
+    0x4300,
+    0x4400,
+    0x4500,
+    0x4600,
+    0x4700,
+    0x4800,
+    0x4900,
+    0x4A00,
+    0x4B00,
+    0x4F00,
+    0x5000,
+    0x5100,
+    0x5200,
+    0x5300,
+    0x5400,
+    0x5500,
+    0x5600,
+    0x5700,
+    0x5800,
+    0x5900,
+    0x5a00,
+    0x5b00,
+    0x5f00,
+    0x6000,
+    0x6100,
+    0x6200,
+    0x6300,
+    0x6400,
+    0x6500,
+    0x6600,
+    0x6700,
+    0x6800,
+    0x6900,
+    0x6a00,
+    0x6b00,
+    0x8f00,
+    0x9000,
+    0x9100,
+    0x9200,
+    0x9300,
+    0x9400,
+    0x9500,
+    0x9600,
+    0x9700,
+    0x9800,
+    0x9900,
+    0x9a00,
+    0x9b00,
+    0xa000,    
+    0xa100,    
+    0xa200,    
+    0xa300,    
+    0xa400,    
+    0xa500,    
+    0xa600,    
+    0xa700,    
+    0xa800,    
+    0xa900,    
+    0xaa00,    
+    0xab00,    
+    0xe000,
+    0xe100,
+    0xf100,
+    0xf200,
+    0xf300
+  };
+
+  fFEDFW->ReadFitelBlockReg( xxx );
+  for (size_t i = 0; i < xxx.size(); ++i)
+    printf("%02x %02x %02x %02x\n", (xxx[i] & 0xff000000)>>24, (xxx[i] & 0xff0000)>>16,  (xxx[i] & 0xff00)>>8,  (xxx[i] & 0xff));
+}
+
 void PixFEDInterface::ConfigureFitel( Fitel* pFitel, bool pVerifLoop )
 {
     setBoard( pFitel->getBeId() );

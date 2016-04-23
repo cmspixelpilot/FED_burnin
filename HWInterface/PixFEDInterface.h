@@ -117,6 +117,8 @@ public:
 
     uint8_t ReadFitelReg( Fitel* pFitel, const std::string& pRegNode);
 
+    void DumpFitelRegs( Fitel* pFitel);
+
     void ConfigureFitel( Fitel* pFitel, bool pVerifLoop = true);
 
     std::vector<double> ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll = false );

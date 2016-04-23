@@ -1,6 +1,6 @@
 C             = gcc
 CXX           = g++
-CCFlags       = -g -O1 -w -Wall -pedantic -std=c++11 -fPIC
+CCFlags       = -g -O0 -w -Wall -pedantic -std=c++11 -fPIC
 CCFlagsRoot   = `root-config --cflags --evelibs --glibs`
 Amc13Flag     = -D__AMC13__
 DevFlags      =

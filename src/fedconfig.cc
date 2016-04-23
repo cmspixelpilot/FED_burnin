@@ -20,6 +20,7 @@ int main(int argc, char* argv[] )
     std::cout << "HW Description File: " << cHWFile << std::endl;
     bool use_amc13 = true;
     bool phases_forever = false;
+    bool dump_fitel_regs = false;
 
     for (int i = 2; i < argc; ++i) {
       const std::string a(argv[i]);
@@ -27,6 +28,8 @@ int main(int argc, char* argv[] )
 	use_amc13 = false;
       else if (a == "phases")
 	phases_forever = true;
+      else if (a == "dump_fitel_regs")
+	dump_fitel_regs = true;
     }
 
     uhal::setLogLevelTo(uhal::Debug());
@@ -64,7 +67,8 @@ int main(int argc, char* argv[] )
     {
         for (auto& cFitel : cFED->fFitelVector)
         {
-            cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
+	  if (dump_fitel_regs) cSystemController.fFEDInterface->DumpFitelRegs(cFitel);
+	  cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
         }
         cSystemController.fFEDInterface->getBoardInfo(cFED);
         cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
@@ -96,5 +100,4 @@ int main(int argc, char* argv[] )
 
 //    cSystemController.HaltHw();
 //    if (use_amc13) cAmc13Controller.HaltAmc13();
-    exit(0);
 }

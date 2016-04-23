@@ -1,7 +1,7 @@
 Objs                    = Fitel.o PixFED.o
 CC              = gcc
 CXX             = g++
-CCFlags         = -g -O1 -Wall -fPIC
+CCFlags         = -g -O0 -Wall -fPIC
 # -fPIC `root-config --cflags --glibs --evelibs`
 #DevFlags                   = -D__CBCDAQ_DEV__
 DevFlags               =

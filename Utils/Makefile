@@ -1,7 +1,7 @@
 Objs                    = Exception.o Utilities.o argvparser.o Data.o
 CC              = gcc
 CXX             = g++
-CCFlags         = -g -O1 -w -Wall -pedantic -fPIC -Wcpp
+CCFlags         = -g -O0 -w -Wall -pedantic -fPIC -Wcpp
 #DevFlags                   = -D__CBCDAQ_DEV__
 DevFlags		=
 

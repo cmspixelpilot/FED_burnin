@@ -1,7 +1,7 @@
 Objs            = RegManager.o PixFEDFWInterface.o FpgaConfig.o CtaFpgaConfig.o Firmware.o PixFEDInterface.o MmcPipeInterface.o
 CC              = gcc
 CXX             = g++
-CCFlags         = -g -O1 -w -Wall -pedantic -fPIC  -Wcpp
+CCFlags         = -g -O0 -w -Wall -pedantic -fPIC  -Wcpp
 #DevFlags                   = -D__CBCDAQ_DEV__
 DevFlags	=
 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<HwDescription>
+    <PixFED Id="0" boardType="CTA">
+        <!-- for fpgaconfig, the address_table doesn't matter as long as it is a CTA one -->
+	<connection id="board" uri="chtcp-2.0://131.225.180.40:10203?target=fed01:50001"  address_table="file://settings/address_table.xml" /> 
+    </PixFED>
+</HwDescription>

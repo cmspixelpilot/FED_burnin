@@ -128,7 +128,7 @@ void PixFEDFWInterface::enableFMCs()
     cVecReg.clear();
 }
 
-void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
+void PixFEDFWInterface::findPhases()
 {
     // Perform all the resets
     std::vector< std::pair<std::string, uint32_t> > cVecReg;
@@ -164,10 +164,10 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     cValVec.clear();
 
     // some additional configuration
-    cVecReg.push_back( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
-    cVecReg.push_back( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
-    WriteStackReg(cVecReg);
-    cVecReg.clear();
+    //cVecReg.push_back( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
+    //cVecReg.push_back( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
+    //WriteStackReg(cVecReg);
+    //cVecReg.clear();
 
     // initialize Phase Finding
     WriteReg("fe_ctrl_regs.initialize_swap", 1);
@@ -202,32 +202,39 @@ void PixFEDFWInterface::findPhases(uint32_t pScopeFIFOCh)
     cVecReg.clear();
 }
 
-void PixFEDFWInterface::monitorPhases(uint32_t pScopeFIFOCh)
+void PixFEDFWInterface::monitorPhases(uint32_t channel)
 {
     //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
     //std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
     std::chrono::milliseconds cWait( 3000 );
 
-    std::string cRegname = "idel_individual_stat.CH" + std::to_string(pScopeFIFOCh);
+    std::string cRegname = "idel_individual_stat.CH" + std::to_string(channel);
     std::vector<uint32_t> cReadValues = ReadBlockRegValue( cRegname, 4 );
-    prettyprintPhase(cReadValues, 0);
+    prettyprintPhase(cReadValues, -channel);
     std::this_thread::sleep_for( cWait );
 }
 
 void PixFEDFWInterface::prettyprintPhase(const std::vector<uint32_t>& pData, int pChannel)
 {
-    std::cout << GREEN << "Fibre: " << std::setw(2) <<  pChannel + 1 << RESET << "    " <<
-              std::bitset<1>( (pData.at( (pChannel * 4 ) + 0 ) >> 10 ) & 0x1 )   << "    " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 0 ) >> 5  ) & 0x1f )  << "    " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 0 )       ) & 0x1f ) << "    " <<
-              BLUE << std::bitset<32>( pData.at( (pChannel * 4 ) + 1 )) << RESET << "    " <<
-              std::bitset<1>( (pData.at( (pChannel * 4 ) + 2 ) >> 31 ) & 0x1 )  << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 23 ) & 0x1f)  << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 18 ) & 0x1f)  << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 13 ) & 0x1f ) << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 8  ) & 0x1f ) << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 ) >> 5  ) & 0x7  ) << " " << std::setw(2) <<
-              ((pData.at( (pChannel * 4 ) + 2 )       ) & 0x1f ) << std::endl;
+  int channelToPrint = pChannel + 1;
+  int index = pChannel * 4;
+  if (pChannel < 0) {
+    channelToPrint = -pChannel;
+    index = 0;
+  }
+  
+  std::cout << GREEN << "Fibre: " << std::setw(2) <<  channelToPrint << RESET << "    " <<
+              std::bitset<1>( (pData.at( (index ) + 0 ) >> 10 ) & 0x1 )   << "    " << std::setw(2) <<
+              ((pData.at( (index ) + 0 ) >> 5  ) & 0x1f )  << "    " << std::setw(2) <<
+              ((pData.at( (index ) + 0 )       ) & 0x1f ) << "    " <<
+              BLUE << std::bitset<32>( pData.at( (index ) + 1 )) << RESET << "    " <<
+              std::bitset<1>( (pData.at( (index ) + 2 ) >> 31 ) & 0x1 )  << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 ) >> 23 ) & 0x1f)  << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 ) >> 18 ) & 0x1f)  << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 ) >> 13 ) & 0x1f ) << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 ) >> 8  ) & 0x1f ) << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 ) >> 5  ) & 0x7  ) << " " << std::setw(2) <<
+              ((pData.at( (index ) + 2 )       ) & 0x1f ) << std::endl;
 }
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
@@ -402,6 +409,7 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
     cVecReg.push_back( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
+    cVecReg.push_back( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
 
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
@@ -441,6 +449,10 @@ bool PixFEDFWInterface::ConfigureBoard( const PixFED* pPixFED, bool pFakeData )
     if ( cDDR3calibrated ) std::cout << "DDR3 calibrated, board configured!" << std::endl;
     return cDDR3calibrated;
 
+}
+
+void PixFEDFWInterface::setChannelOfInterest(uint32_t channel) {
+  WriteReg("fe_ctrl_regs.fifo_config.channel_of_interest", channel);
 }
 
 void PixFEDFWInterface::HaltBoard()
@@ -855,7 +867,7 @@ std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint
         else
             cLTCValues.at(cMeasurement) = (cSign == 0b1) ? (-( 32768 - cValue ) * cConstant) : (cValue * cConstant);
         if (pPrintAll)
-            std::cout << "V " << cMeasurement + 1 << " = " << cLTCValues.at(cMeasurement) << std::endl;
+          std::cout << "V" << cMeasurement + 1 << " = " << std::setw(15) << cLTCValues.at(cMeasurement) << " ";
     }
 
 // now I have all 4 voltage values in a vector of size 5
@@ -867,7 +879,7 @@ std::vector<double> PixFEDFWInterface::ReadADC( const uint8_t pFMCId, const uint
 //
 // the RSSI value = fabs(V3-V4) / R=150 Ohm [in Amps]
     double cADCVal = fabs(cLTCValues.at(2) - cLTCValues.at(3)) / 150.0;
-    std::cout << BOLDBLUE << "FMC " << +pFMCId << " Fitel " << +pFitelId << " RSSI " << cADCVal * 1000  << " mA" << RESET << std::endl;
+    std::cout << BOLDBLUE << " RSSI " << cADCVal * 1000  << " mA" << RESET << std::endl;
     return cLTCValues;
 }
 

@@ -421,7 +421,7 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
         //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
         char tmp[25];
         snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", swap_channels( cChannel ) );
-        std::cout << tmp << std::endl;
+        //std::cout << tmp << std::endl;
         // setting the value to 0x08 enables the channel, 0x02 disables it
         // setting it to 0x0c enables the RSSI readback
         uint8_t cValue = (pEnable) ? 0x08 : 0x02;
@@ -432,7 +432,7 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
 std::vector<double> PixFEDInterface::ReadADC( Fitel* pFitel, uint32_t pChan, bool pPrintAll)
 {
     pChan = (pChan % 12 ) + 1;
-    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << pChan << std::endl;
+    std::cout << "Reading ADC Values on FMC " << +pFitel->getFMCId() << " Fitel " << +pFitel->getFitelId() << " Channel " << std::setw(2) << pChan << ": ";
     setBoard(pFitel->getBeId());
     // in order to read the ADC values for a given channel (a group of channels, the Channel needs to be configured in the Fitel I2C register space)
     // I could do this via the files, but it is easier to just do it here
@@ -509,6 +509,13 @@ void PixFEDInterface::ConfigureFED( const PixFED * pFED )
     fFEDFW->ConfigureBoard( pFED );
 }
 
+void PixFEDInterface::setChannelOfInterest( const PixFED * pFED, uint32_t channel )
+{
+    //before I can configure the FED FW, I need to load it to the CTA which runs the golden Image as default!
+    setBoard( pFED->getBeId() );
+    fFEDFW->setChannelOfInterest( channel );
+}
+
 void PixFEDInterface::HaltFED( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
@@ -525,16 +532,16 @@ void PixFEDInterface::HaltFED( const PixFED * pFED )
 // Setup  Methods
 //////////////
 
-void PixFEDInterface::findPhases( const PixFED * pFED, uint32_t pScopeFIFOCh )
+void PixFEDInterface::findPhases( const PixFED * pFED )
 {
     setBoard( pFED->getBeId() );
-    fFEDFW->findPhases(pScopeFIFOCh);
+    fFEDFW->findPhases();
 }
 
-void PixFEDInterface::monitorPhases(const PixFED* pFED, uint32_t pScopeFIFOCh)
+void PixFEDInterface::monitorPhases(const PixFED* pFED, uint32_t channel)
 {
     setBoard( pFED->getBeId() );
-    fFEDFW->monitorPhases(pScopeFIFOCh);
+    fFEDFW->monitorPhases(channel);
 }
 
 

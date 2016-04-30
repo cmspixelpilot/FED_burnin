@@ -104,6 +104,7 @@ public:
     * \param pPixFED
     */
     bool ConfigureBoard( const PixFED* pPixFED, bool pFakeData = false );
+    void setChannelOfInterest(uint32_t channel);
     /*!
      * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
      */
@@ -120,11 +121,11 @@ public:
     /*!
      * \brief: find correct phases for incoming data stream
      */
-    void findPhases(uint32_t pScopeFIFOCh = 0);
+    void findPhases();
     /*!
      * \brief: find correct phases for incoming data stream
      */
-    void monitorPhases(uint32_t pScopeFIFOCh = 0);
+    void monitorPhases(uint32_t channel);
     /*!
      * \brief: read the bistream FIFO of the PixFED
      */

@@ -730,11 +730,10 @@ void findLight(){
 }
 
 void findPhases(){
-
   for (auto& cFED : cSystemController.fPixFEDVector)
     {
       cSystemController.fFEDInterface->getBoardInfo(cFED);
-      cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
+      cSystemController.fFEDInterface->findPhases(cFED);
     }
 }
 

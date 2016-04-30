@@ -145,6 +145,7 @@ public:
      * \param pFED
      */
     void ConfigureFED( const PixFED* pFED );
+    void setChannelOfInterest( const PixFED* pFED, uint32_t channel );
     /*!
      * \brief: Halt the FED and put it back into safe mode
      */
@@ -153,12 +154,12 @@ public:
      * \brief: find Phases for input data stream
      * \param: pScopeFIFOCh: channel for Phase Stability monitoring
      */
-    void findPhases( const PixFED* pFED, uint32_t pScopeFIFOCh = 0 );
+    void findPhases( const PixFED* pFED );
     /*!
      * \brief: find Phases for input data stream
      * \param: pScopeFIFOCh: channel for Phase Stability monitoring
      */
-    void monitorPhases( const PixFED* pFED, uint32_t pScopeFIFOCh = 0 );
+    void monitorPhases( const PixFED* pFED, uint32_t channel );
     /*!
      * \brief: read transparent Fifo
      * \return: vector of 32 bit words with FIFO content

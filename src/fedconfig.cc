@@ -68,10 +68,12 @@ int main(int argc, char* argv[] )
         for (auto& cFitel : cFED->fFitelVector)
         {
 	  if (dump_fitel_regs) cSystemController.fFEDInterface->DumpFitelRegs(cFitel);
-	  cSystemController.fFEDInterface->ReadADC(cFitel, cChannelOfInterest, true);
+          for (int i = 0; i < 12; ++i)
+            cSystemController.fFEDInterface->ReadADC(cFitel, i, true);
         }
+        cSystemController.fFEDInterface->setChannelOfInterest(cFED, cChannelOfInterest);
         cSystemController.fFEDInterface->getBoardInfo(cFED);
-        cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
+        cSystemController.fFEDInterface->findPhases(cFED);
     }
 
     if (phases_forever) {
@@ -82,7 +84,7 @@ int main(int argc, char* argv[] )
 	  cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
     }
 
-    for (int i = 0; i < 11; i++)
+    for (int i = 0; i < 10000; i++)
     {
          for (auto& cFED : cSystemController.fPixFEDVector)
          {

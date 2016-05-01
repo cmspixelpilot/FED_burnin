@@ -421,10 +421,10 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
         //temporary fix: Fibre 1 corresponds to FITEL channel 12 an vice versa
         char tmp[25];
         snprintf( tmp, sizeof(tmp), "Ch%02d_ConfigReg", swap_channels( cChannel ) );
-        //std::cout << tmp << std::endl;
         // setting the value to 0x08 enables the channel, 0x02 disables it
         // setting it to 0x0c enables the RSSI readback
         uint8_t cValue = (pEnable) ? 0x08 : 0x02;
+        std::cout << tmp << " 0x" << std::hex << +cValue << std::dec << std::endl;
         WriteFitelReg(pFitel, std::string(tmp), cValue, false);
     }
 }

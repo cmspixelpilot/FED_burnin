@@ -15,7 +15,7 @@
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">
-        <connection id="board0" uri="chtcp-2.0://localhost:10203?target=fed01:50001" address_table="file://settings/address_table.xml" />
+        <connection id="board0" uri="chtcp-2.0://localhost:10203?target=fed02:50001" address_table="file://settings/address_table.xml" />
         <!-- Trigger -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
@@ -25,23 +25,23 @@
         <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFF7</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFF7</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
 	<!-- FMC0: lower FMC, FMC1: upper FMC -->
-        <Fitel FMC="0" Id="0" file="FMC0_Fitel0.txt" Enable="1,2,3,4,5,6,7,8,9,10,11,12"/>
-        <!--<Fitel FMC="0" Id="1" file="FMC0_Fitel1.txt" Enable="1,2,3,4,5,6,7,8,9,10,11,12"/>-->
-        <!--<Fitel FMC="1" Id="0" file="FMC1_Fitel0.txt" />-->
-        <!--<Fitel FMC="1" Id="1" file="FMC1_Fitel1.txt" />-->
+        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="10"/>
+        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable=""/>
+        <!--<Fitel FMC="1" Id="0" file="FMCFITEL.txt" />-->
+        <!--<Fitel FMC="1" Id="1" file="FMCFITEL.txt" />-->
     </PixFED>
 </HwDescription>
 <Settings>
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
     <!-- 0 indexed -->
-    <Setting name="ChannelOfInterest">7</Setting>
+    <Setting name="ChannelOfInterest">21</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">1024</Setting>

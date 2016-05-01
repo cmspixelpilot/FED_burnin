@@ -426,6 +426,8 @@ void PixFEDInterface::toggleFitelChannels(Fitel* pFitel, bool pEnable)
         uint8_t cValue = (pEnable) ? 0x08 : 0x02;
         std::cout << tmp << " 0x" << std::hex << +cValue << std::dec << std::endl;
         WriteFitelReg(pFitel, std::string(tmp), cValue, false);
+//GEORG TESTING
+std::cout << cChannel << " " <<  tmp << " " << +cValue << std::endl;
     }
 }
 
@@ -605,10 +607,14 @@ void PixFEDInterface::Resume( PixFED * pFED )
 std::vector<uint32_t> PixFEDInterface::ReadData( PixFED * pFED, uint32_t pBlockSize )
 {
     setBoard( pFED->getBeId() );
-    std::cout << pBlockSize << std::endl;
     return fFEDFW->ReadData( pFED, pBlockSize );
 }
 
+std::vector<uint32_t> PixFEDInterface::ReadNEvents( PixFED * pFED, uint32_t pNEvents )
+{
+    setBoard( pFED->getBeId() );
+    return fFEDFW->ReadNEvents( pFED, pNEvents );
+}
 
 ///////////////
 // Auxillary  Methods

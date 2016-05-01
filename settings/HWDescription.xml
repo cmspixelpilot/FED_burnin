@@ -16,18 +16,24 @@
     </AMC13>
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://localhost:10203?target=fed02:50001" address_table="file://settings/address_table.xml" />
-        <!-- Trigger -->
+        <!-- Trigger & Acquisition -->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
         <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
-        <Register name="pixfed_ctrl_regs.TRIGGER_SEL">0</Register>
-        <!--<Register name="pixfed_ctrl_regs.INTERNAL_TRIG_EN">0</Register>-->
+        <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
-        <!--<Register name="pixfed_ctrl_regs.INT_TRIGGER_FREQ_SEL">9</Register>-->
-        <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
+        <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
         <!-- TBM MASK -->
         <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
-        <Register name="pixfed_ctrl_regs.TBM_MASK_3">0xFFFFFFFF</Register>
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask">0x00</Register>
+        <!--SLINK-->
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x00</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x1</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_stat">0xf</Register>
+
         <!-- FITELS -->
         <Fitel_Files path="./settings/" />
 	<!-- FMC0: lower FMC, FMC1: upper FMC -->
@@ -37,6 +43,7 @@
         <!--<Fitel FMC="1" Id="1" file="FMCFITEL.txt" />-->
     </PixFED>
 </HwDescription>
+
 <Settings>
     <!--Setting name="NTBM">2</Setting-->
     <!--<Setting name="ChannelOfInterest">0</Setting>-->
@@ -45,6 +52,7 @@
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
     <Setting name="BlockSize">1024</Setting>
+    <Setting name="NEventsCommissioningMode">6</Setting>
     <!--if set to 0, loop will run forever-->
-    <!--<Setting name="NAcq">100</Setting>-->
+    <Setting name="NAcq">100</Setting>
 </Settings>

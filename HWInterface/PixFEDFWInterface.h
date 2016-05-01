@@ -17,6 +17,7 @@
 #include "../Utils/Utilities.h"
 #include "../Utils/Exception.h"
 #include "../Utils/ConsoleColor.h"
+#include "../Utils/Utilities.h"
 #include "../HWDescription/PixFED.h"
 #include "CtaFpgaConfig.h"
 
@@ -48,6 +49,7 @@ private:
     uint32_t fBlockSize;    // the number of bits to read from the DDR memory
     uint32_t fBlockSize32; // the number of 32-bit words to read from DDR memory
     uint32_t fNthAcq;       // the index of the current Acquistion - to be used to select the correct DDR bank
+    uint32_t fAcq_mode;
     //struct timeval fStartVeto;
     CtaFpgaConfig* fpgaConfig;
     // strings fro DDR control
@@ -164,11 +166,16 @@ public:
     /*!
      * \brief Read data from DAQ
      * \param pPixFED
-     * \param pNthAcq : actual number of acquisitions
      * \param pBreakTrigger : if true, enable the break trigger
-     * \return cNPackets: the number of packets read
+     * \return vector<uint32_t> cData
      */
     std::vector<uint32_t> ReadData( PixFED* pPixFED, uint32_t pBlockSize = 0 );
+    /*!
+     * \brief Read data from Slink FIFO
+     * \param pPixFED
+     * \return vector<uint32_t> cData
+     */
+    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
 
     // EVENT HANDLING
     //const Event* GetNextEvent( const PixFED* pPixFED ) const;
@@ -235,6 +242,7 @@ private:
     void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
+    void prettyprintSlink(const std::vector<uint64_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
 
     // FPGA CONFIG METHODS

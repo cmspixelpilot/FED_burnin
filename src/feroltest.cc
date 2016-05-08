@@ -50,7 +50,7 @@ int main(int argc, char* argv[] )
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
         cSystemController.fFEDInterface->getBoardInfo(cFED);
-        cSystemController.fFEDInterface->findPhases(cFED, cChannelOfInterest);
+        cSystemController.fFEDInterface->findPhases(cFED);
     }
 
     //std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;

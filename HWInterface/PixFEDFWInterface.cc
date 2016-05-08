@@ -622,6 +622,7 @@ uint32_t cBlockSize = (fAcq_mode == 1) ?  2 * cNWords32 + 1 :
                           cNWords32 + (2 * 2 * pNEvents) + 1;
 std::cout << "This translates into " << cBlockSize << " words in the current mode: " << fAcq_mode << std::endl;
 
+
     // DDR control: 0 = ipbus, 1 = user
     //WriteReg ( fStrDDRControl, 0 );
     std::this_thread::sleep_for ( cWait );

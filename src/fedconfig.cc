@@ -9,7 +9,7 @@
 #include "../Utils/Data.h"
 void mypause()
 {
-    std::cout << "Press [Enter] to read FIFOs ...";
+    std::cout << "Press [Enter] ...";
     std::cin.get();
 
 }
@@ -19,17 +19,26 @@ int main(int argc, char* argv[] )
     const char* cHWFile = argv[1];
     std::cout << "HW Description File: " << cHWFile << std::endl;
     bool use_amc13 = true;
+    bool do_phases = true;
     bool phases_forever = false;
+    bool phases_forever_one = false;
     bool dump_fitel_regs = false;
+    bool do_calib_mode = false;
 
     for (int i = 2; i < argc; ++i) {
       const std::string a(argv[i]);
-      if (a == "noamc13")
+      if (a == "no_amc13")
 	use_amc13 = false;
-      else if (a == "phases")
+      else if (a == "phases_forever_one")
+	phases_forever_one = true;
+      else if (a == "phases_forever")
 	phases_forever = true;
+      else if (a == "no_phases")
+	do_phases = false;
       else if (a == "dump_fitel_regs")
 	dump_fitel_regs = true;
+      else if (a == "do_calib_mode")
+	do_calib_mode = true;
     }
 
     uhal::setLogLevelTo(uhal::Debug());
@@ -76,10 +85,15 @@ int main(int argc, char* argv[] )
         }
         cSystemController.fFEDInterface->setChannelOfInterest(cFED, cChannelOfInterest);
         cSystemController.fFEDInterface->getBoardInfo(cFED);
-        cSystemController.fFEDInterface->findPhases(cFED);
+        if (do_phases) cSystemController.fFEDInterface->findPhases(cFED);
+        if (phases_forever)
+          while (true) {
+            mypause();
+            cSystemController.fFEDInterface->findPhases(cFED);
+          }
     }
 
-    if (phases_forever) {
+    if (phases_forever_one) {
       std::cout << "Monitoring Phases for selected Channel of Interest for 10 seconds ... " << std::endl << std::endl;
       std::cout << BOLDGREEN << "FIBRE CTRL_RDY CNTVAL_Hi CNTVAL_Lo   pattern:                     S H1 L1 H0 L0   W R" << RESET << std::endl;
       while (true)
@@ -98,7 +112,7 @@ int main(int argc, char* argv[] )
              cSystemController.fFEDInterface->readFIFO1(cFED);
              cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
              //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-             cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+             if (do_calib_mode) cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
          }
     }
     

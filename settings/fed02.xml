@@ -12,7 +12,7 @@
              for 1 trigger when sending burst (equivalent to single trigger -->
         <Trigger local="1" mode="0" rate="1" burst="1" rules="0" />
         <!--<Register tounge="T1" name="test.test">0</Register>-->
-        <TTCSimulator>0</TTCSimulator>
+        <TTCSimulator>1</TTCSimulator>
     </AMC13>
     <PixFED Id="0" boardType="CTA">
         <connection id="board0" uri="chtcp-2.0://localhost:10203?target=fed02:50001" address_table="file://settings/address_table.xml" />
@@ -24,7 +24,7 @@
         <!--1: TBM fifo, 2: Slink FIFO, 3: FEROL-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
         <!-- TBM MASK -->
-        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFCF</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xffff3fff</Register>
         <Register name="pixfed_ctrl_regs.TBM_MASK_2">0xFFFFFFFF</Register>
         <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask">0x00</Register>
         <!--SLINK-->
@@ -41,8 +41,8 @@
         <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="10"/>
         <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable=""/>
         -->
-        <Fitel FMC="1" Id="0" file="FMCFITEL.txt" Enable="1,2,3,4,5,6,7,8,9,10,11,12"/>
-        <Fitel FMC="1" Id="1" file="FMCFITEL.txt" Enable="1,2,3,4,5,6,7,8,9,10,11,12"/>
+        <Fitel FMC="1" Id="0" file="FMCFITEL.txt" Enable="1"/>
+        <Fitel FMC="1" Id="1" file="FMCFITEL.txt" Enable=""/>
     </PixFED>
 </HwDescription>
 <Settings>
@@ -52,7 +52,7 @@
     <Setting name="ChannelOfInterest">23</Setting>
     <!-- 0 indexed -->
     <Setting name="ROCOfInterest">1</Setting>
-    <Setting name="BlockSize">1024</Setting>
+    <Setting name="BlockSize">102400</Setting>
     <Setting name="NEventsCommissioningMode">1</Setting>
     <!--if set to 0, loop will run forever-->
     <!--<Setting name="NAcq">100</Setting>-->

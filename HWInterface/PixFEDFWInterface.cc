@@ -341,26 +341,41 @@ void PixFEDFWInterface::prettyprintFIFO1 ( const std::vector<uint32_t>& pFifoVec
         if (pMarkerVec.at (cIndex) == 8)
         {
             // Event Header
-            os << RED << std::dec << "    Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << RED << std::dec << "    Header: "
+               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
+               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
+               << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff )
+               << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at (cIndex) == 12)
-            os << std::dec << GREEN << "ROC Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::dec << GREEN << "ROC Header: "
+               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  )
+               << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
+               << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
 
         if (pMarkerVec.at (cIndex) == 1)
-            os  << std::dec << "            CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f ) << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff ) <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
+            os  << std::dec << "            "
+                << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
+                << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
+                << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f )
+                << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff )
+                <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
 
         if (pMarkerVec.at (cIndex) == 4)
-        {
             // TBM Trailer
-            os << std::dec << BLUE << "   Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_T2: " <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff ) << " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
-        }
+            os << std::dec << BLUE << "   Trailer: "
+               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
+               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
+               << " TBM_T2: " <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff )
+               << " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
 
         if (pMarkerVec.at (cIndex) == 6)
-        {
             // Event Trailer
-            os << std::dec << RED << "Event Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
-        }
+            os << std::dec << RED << "Event Trailer: "
+               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
+               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
+               << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
     }
 
     os << "----------------------------------------------------------------------------------" << std::endl;
@@ -410,8 +425,6 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     //WriteReg( "pixfed_ctrl_regs.PC_CONFIG_OK", 0 );
     //Primary Configuration
     cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
-    //cVecReg.push_back( {"pixfed_ctrl_regs.INT_TRIGGER_EN", 0} );
-    cVecReg.push_back( {"pixfed_ctrl_regs.rx_index_sel_en", 0} );
     cVecReg.push_back( {"fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );

@@ -18,6 +18,7 @@
 #include "../Utils/Exception.h"
 #include "../Utils/ConsoleColor.h"
 #include "../Utils/Utilities.h"
+#include "../Utils/Timer.h"
 #include "../HWDescription/PixFED.h"
 #include "CtaFpgaConfig.h"
 
@@ -50,6 +51,8 @@ private:
     uint32_t fBlockSize32; // the number of 32-bit words to read from DDR memory
     uint32_t fNthAcq;       // the index of the current Acquistion - to be used to select the correct DDR bank
     uint32_t fAcq_mode;
+    uint32_t fNEvents_calmode;
+    uint32_t fCalibMode;
     //struct timeval fStartVeto;
     CtaFpgaConfig* fpgaConfig;
     // strings fro DDR control
@@ -129,6 +132,10 @@ public:
      */
     void monitorPhases(uint32_t channel);
     /*!
+     * \brief: initialize Slink to send data
+     */
+    void getSFPStatus (uint8_t pFMCId);
+    /*!
      * \brief: read the bistream FIFO of the PixFED
      */
     std::vector<uint32_t> readTransparentFIFO();
@@ -146,6 +153,10 @@ public:
      * \return: the joined 16bit OSD words for both TBM cores A is bits [0:15], B is bits [16:31]
      */
     uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh );
+    /*!
+     * \brief: Read the TTS State
+     */
+    uint8_t readTTSState(); 
     /*!
      * \brief Start a DAQ
      */
@@ -175,7 +186,7 @@ public:
      * \param pPixFED
      * \return vector<uint32_t> cData
      */
-    std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
+    //std::vector<uint32_t> ReadNEvents( PixFED* pPixFED, uint32_t pNEvents = 1 );
 
     // EVENT HANDLING
     //const Event* GetNextEvent( const PixFED* pPixFED ) const;
@@ -222,6 +233,12 @@ public:
      */
     std::vector<double> ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
 
+    /*!
+     * \brief Read and print the status of the SLINK
+     *  
+     */
+    void PrintSlinkStatus();
+
 private:
     void getFEDNetworkParameters();
     /*!
@@ -239,11 +256,13 @@ private:
      * \return Number of 32-bit words to be read at each iteration */
     uint32_t computeBlockSize(bool pFakeData = false);
 
+void prettyPrintTransparentFIFO(const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI);
     void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
     void prettyprintSlink(const std::vector<uint64_t>& pData);
     void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
+    void decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI);
 
     // FPGA CONFIG METHODS
 public:

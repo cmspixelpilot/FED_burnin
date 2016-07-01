@@ -13,7 +13,7 @@ void mypause()
     std::cin.get();
 
 }
-int main(int argc, char* argv[] )
+int main (int argc, char* argv[] )
 {
 
     const char* cHWFile = argv[1];
@@ -41,48 +41,39 @@ int main(int argc, char* argv[] )
 	do_calib_mode = true;
     }
 
-    uhal::setLogLevelTo(uhal::Debug());
+    uhal::setLogLevelTo (uhal::Debug() );
 
     // instantiate System Controller
     SystemController cSystemController;
     Amc13Controller cAmc13Controller;
 
     // initialize map of settings so I can know the proper number of acquisitions and TBMs
-    cSystemController.InitializeSettings(cHWFile, std::cout);
+    cSystemController.InitializeSettings (cHWFile, std::cout);
 
     // initialize HWdescription from XML, beware, settings have to be read first
-    if (use_amc13) cAmc13Controller.InitializeAmc13( cHWFile, std::cout );
-    cSystemController.InitializeHw(cHWFile, std::cout);
+    if (use_amc13) cAmc13Controller.InitializeAmc13 ( cHWFile, std::cout );
+    cSystemController.InitializeHw (cHWFile, std::cout);
 
-    // configure the HW
-    if (use_amc13) cAmc13Controller.ConfigureAmc13( std::cout );
-    cSystemController.ConfigureHw(std::cout );
+    auto cSetting = cSystemController.fSettingsMap.find ("NAcq");
+    int cNAcq = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 10;
+    cSetting = cSystemController.fSettingsMap.find ("BlockSize");
+    int cBlockSize = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 2;
 
-    if (use_amc13) cAmc13Controller.fAmc13Interface->StartL1A();
+    cSetting = cSystemController.fSettingsMap.find ("ChannelOfInterest");
+    int cChannelOfInterest = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 0;
 
-    auto cSetting = cSystemController.fSettingsMap.find("NAcq");
-    int cNAcq = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 10;
-    cSetting = cSystemController.fSettingsMap.find("BlockSize");
-    int cBlockSize = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 2;
+    cSetting = cSystemController.fSettingsMap.find ("ROCOfInterest");
+    int cROCOfInterest = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 0;
 
-    cSetting = cSystemController.fSettingsMap.find("ChannelOfInterest");
-    int cChannelOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
+    // configure the AMC13
+    if (use_amc13) cAmc13Controller.ConfigureAmc13 ( std::cout );
 
-    cSetting = cSystemController.fSettingsMap.find("ROCOfInterest");
-    int cROCOfInterest = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 0;
-
-    cSetting = cSystemController.fSettingsMap.find("NEventsCommissioningMode");
-    int cNEventsCommMode = (cSetting != std::end(cSystemController.fSettingsMap)) ? cSetting->second : 1;
+    //configure FED & FITELS & SFP+
+    cSystemController.ConfigureHw (std::cout );
 
     // get the board info of all boards and start the acquistion
     for (auto& cFED : cSystemController.fPixFEDVector)
     {
-        for (auto& cFitel : cFED->fFitelVector)
-        {
-	  if (dump_fitel_regs) cSystemController.fFEDInterface->DumpFitelRegs(cFitel);
-          for (int i = 0; i < 12; ++i)
-            cSystemController.fFEDInterface->ReadADC(cFitel, i, true);
-        }
         cSystemController.fFEDInterface->setChannelOfInterest(cFED, cChannelOfInterest);
         cSystemController.fFEDInterface->getBoardInfo(cFED);
         if (do_phases) cSystemController.fFEDInterface->findPhases(cFED);
@@ -101,23 +92,32 @@ int main(int argc, char* argv[] )
 	  cSystemController.fFEDInterface->monitorPhases(cFED, cChannelOfInterest);
     }
 
+    std::cout << "FED Configured, SLink Enabled, pressing Enter will send an EC0 & start periodic L1As" << std::endl;
+    mypause();
+    if (use_amc13) {
+      cAmc13Controller.fAmc13Interface->SendEC0();
+      cAmc13Controller.fAmc13Interface->StartL1A();
+    }
+
     for (int i = 0; i < 10000; i++)
     {
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
-            cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
              mypause();
-             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
-             //cSystemController.fFEDInterface->readSpyFIFO(cFED);
+             cSystemController.fFEDInterface->readTransparentFIFO(cFED);
+             cSystemController.fFEDInterface->readSpyFIFO(cFED);
              cSystemController.fFEDInterface->readFIFO1(cFED);
-             //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
-             if (do_calib_mode) cSystemController.fFEDInterface->ReadNEvents(cFED, cNEventsCommMode );
+             cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
+             cSystemController.fFEDInterface->ReadData(cFED, 0 );
          }
     }
     
     if (use_amc13) cAmc13Controller.fAmc13Interface->StopL1A();
 
-//    cSystemController.HaltHw();
-//    if (use_amc13) cAmc13Controller.HaltAmc13();
+    for (auto& cFED : cSystemController.fPixFEDVector)
+        cSystemController.fFEDInterface->Stop (cFED);
+
+    //cSystemController.HaltHw();
+    if (use_amc13) cAmc13Controller.HaltAmc13();
 }

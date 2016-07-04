@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<HwDescription>
+    <AMC13>
+        <connection id="T1" uri="chtcp-2.0://cmsuppixch:10203?target=devamc13T1:50001" address_table="file://settings/AMC13XG_T1.xml" />
+        <connection id="T2" uri="chtcp-2.0://cmsuppixch:10203?target=devamc13T2:50001" address_table="file://settings/AMC13XG_T2.xml" />
+        <AMCmask enable="1,2,3,4,5,6,7,8,9,10,11,12" />
+        <!--This is used to send a calibration Trigger via the AMC13s internal BGO mechanism, 0x2c is the command configured as BGO15 
+             on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
+             L1A which is periodic at BX500 every orbit-->
+        <!-- for the DEV lab setup in B186, the bx has to be 381 for the BU clock source and 380 for the TTCci as clock source -->
+        <BGO command="0x2c" repeat="1" prescale="0" bx="380" />
+        <!--<BGO command="0x2e" repeat="0" prescale="0" bx="0" />-->
+        <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
+             for 1 trigger when sending burst (equivalent to single trigger -->
+        <Trigger local="1" mode="2" rate="50000" burst="1" rules="0" /> 
+        <!--<Register tounge="T1" name="test.test">0</Register>-->
+        <TTCSimulator>0</TTCSimulator>
+    </AMC13>
+    <PixFED Id="0" boardType="CTA">
+        <connection id="board0" uri="chtcp-2.0://cmsuppixch:10203?target=devfed:50001" address_table="file://settings/address_table.xml" />
+
+        <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
+        <!--1: TBM fifo, 2: Slink FIFO, 4: FEROL-->
+        <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
+        <!--this is 0-indexed so 9 will correspond to 10 events-->
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
+        <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
+        <Register name="pixfed_ctrl_regs.data_type">0</Register>
+
+        <!--SLINK HEADER & TRAILER-->
+        <Register name="pixfed_ctrl_regs.slink_ctrl.privateEvtNb">0x01</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_source_id">0x01</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_FOV">0xe</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_ty">0xa</Register>
+        <Register name="pixfed_ctrl_regs.slink_ctrl.slinkFormatH_Evt_stat">0xf</Register>
+
+        <!-- TBM MASK -->
+        <Register name="pixfed_ctrl_regs.TBM_MASK_1">0xFFFFFFFC</Register>
+        <Register name="pixfed_ctrl_regs.TBM_MASK_2">0x0000FFFF</Register>
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask">0x00</Register>
+        <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
+
+        <!--TTS CONFIG-->
+        <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.event_cnt_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_value"> 255 </Register>
+        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 255</Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 255 </Register>
+        <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.force_RDY"> 1 </Register>
+
+        <!--CLOCK-->
+        <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->
+        <Register name="ctrl.ttc_xpoint_A_out3">0</Register>
+        <!--<Register name="ctrl.mgt_xpoint_out1">3 </Register>-->
+        <!--2 to have 156 MHz clock (obligatory for 10G sling), 3 for 125Mhz clock for 5g on SLink -->
+        <Register name="ctrl.mgt_xpoint_out1">3 </Register>
+
+        <!-- FITELS -->
+        <Fitel_Files path="./settings/" />
+        <Fitel FMC="0" Id="0" file="FMCFITEL.txt" Enable="" />
+        <Fitel FMC="0" Id="1" file="FMCFITEL.txt" Enable="1" />
+    </PixFED>
+</HwDescription>
+
+<Settings>
+    <!-- 0 indexed -->
+    <Setting name="ChannelOfInterest">0</Setting>
+    <!-- 0 indexed -->
+    <Setting name="ROCOfInterest">1</Setting>
+    <Setting name="BlockSize">512</Setting>
+    <!--if set to 0, loop will run forever-->
+    <Setting name="NAcq">0</Setting>
+</Settings>

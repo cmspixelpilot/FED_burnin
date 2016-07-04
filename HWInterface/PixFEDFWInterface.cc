@@ -645,11 +645,49 @@ uint8_t PixFEDFWInterface::readTTSState()
             break;
     }
 
-    uint32_t cTTSState = ReadReg ("pixfed_stat_regs.TTS_FSM_STAGE");
-    uint32_t cDAQRdy = ReadReg ("pixfed_stat_regs.DAQ_FEROL_VALID");
-    std::cout << std::hex << "TTS FSM STAGE: " << cTTSState << " DAQ_FEROL_VALID " << cDAQRdy << std::endl;
+    //uint32_t cTTSState = ReadReg ("pixfed_stat_regs.TTS_FSM_STAGE");
+    //uint32_t cDAQRdy = ReadReg ("pixfed_stat_regs.DAQ_FEROL_VALID");
+    //std::cout << std::hex << "TTS FSM STAGE: " << cTTSState << " DAQ_FEROL_VALID " << cDAQRdy << std::endl;
 
     return cWord;
+}
+
+
+void PixFEDFWInterface::readErrorFIFO (bool pForce)
+{
+    if (pForce)
+    {
+        std::cout << "Forcing read of ERROR Fifo!" << std::endl;
+        //first, enable the error fifo
+        WriteReg ("pixfed_ctrl_regs.error_fifo_force_read", 1);
+    }
+
+    //then poll for error fifo ready=1
+    while (ReadReg ("pixfed_stat_regs.error_fifo_read_rdy") != 1) usleep (100);
+
+    std::cout << "Error FIFO read ready =1! " << std::endl;
+
+    uint32_t cErrorWords = ReadReg ("pixfed_stat_regs.error_fifo_wr_data_count");
+    std::cout << "Error FIFO contains " << cErrorWords << " error words!" << std::endl;
+
+    //block read the error fifo with cErrorWords words
+    std::vector<uint32_t> cErrors = ReadBlockRegValue ("ERROR_fifo" , cErrorWords );
+
+    //done reading the error fifo
+    WriteReg ("pixfed_ctrl_regs.error_fifo_read_done", 1);
+
+    //then poll for error fifo ready = 0
+    while (ReadReg ("pixfed_stat_regs.error_fifo_read_rdy") = 1) usleep (100);
+
+    //release
+    WriteReg ("pixfed_ctrl_regs.error_fifo_read_done", 0);
+
+    if (pForce) WriteReg ("pixfed_ctrl_regs.error_fifo_force_read", 0);
+
+    std::cout << "ERROR Fifo content: " << std::endl;
+
+    for (auto& cWord : cErrors)
+        std::cout << std::bitset<32> (cWord) << std::endl;
 }
 
 bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )

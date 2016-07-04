@@ -183,6 +183,10 @@ class PixFEDInterface
 
     uint8_t readTTSState ( const PixFED* pFED );
 
+    /*
+     * \brief: read the Error FIFO
+     */
+    void readErrorFIFO (const PixFED* pFED, bool pForce);
     /*!
      * \brief Start a DAQ
      * \param pFED

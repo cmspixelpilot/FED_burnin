@@ -645,6 +645,10 @@ uint8_t PixFEDFWInterface::readTTSState()
             break;
     }
 
+    uint32_t cTTSState = ReadReg ("pixfed_stat_regs.TTS_FSM_STAGE");
+    uint32_t cDAQRdy = ReadReg ("pixfed_stat_regs.DAQ_FEROL_VALID");
+    std::cout << std::hex << "TTS FSM STAGE: " << cTTSState << " DAQ_FEROL_VALID " << cDAQRdy << std::endl;
+
     return cWord;
 }
 

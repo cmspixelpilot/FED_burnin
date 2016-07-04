@@ -172,7 +172,7 @@ void PixFEDFWInterface::findPhases (uint32_t pScopeFIFOCh)
     // some additional configuration
     cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
     cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.channel_of_interest", pScopeFIFOCh} ); // set channel for scope FIFO
-    cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.TBM_old_new", 0x1} ); // 0x1 = PSI46dig, 0x0 = PROC600
+    cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.TBM_old_new", 0x0} ); // 0x0 = PSI46dig, 0x1 = PROC600
     WriteStackReg (cVecReg);
     cVecReg.clear();
 
@@ -411,7 +411,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
-    WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
+    //WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
     //vectors to pass to the NRZI decoder as reference to be filled by that
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
@@ -768,6 +768,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
 
     //poll for the selected DDR bank to be full
     uhal::ValWord<uint32_t> cVal;
+    std::cout << "I get stuck here " << fStrFull << std::endl;
 
     do
     {
@@ -776,6 +777,8 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
         if ( cVal == 0 ) std::this_thread::sleep_for ( cWait );
     }
     while ( cVal == 0 );
+
+    std::cout << "Because I can not see this" << std::endl;
 
     if (fCalibMode == 1)
     {
@@ -1078,7 +1081,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     // the ADC always reads the sum of all the enabled channels!
     //initial FW setup
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
-    sleep (0.5);
+    //sleep (0.5);
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
 
     std::vector<std::pair<std::string, uint32_t> > cVecReg;
@@ -1238,44 +1241,44 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout << BOLDBLUE << "Input Counters : " << RESET;
     std::cout << "Data counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x2);
-    uint64_t val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    uint64_t val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Event counter
     std::cout << "Event counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x3);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Block counter
     std::cout << "Block counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x4);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Packets recieved counter
     std::cout << "Pckt rcv counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x5);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Packets send counter
     std::cout << BOLDBLUE << "Output Counter : " << RESET;
     std::cout << "Pckt send counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x7);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Status build
     std::cout << "Status build: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x8);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Back pressure counter
     std::cout << "BackP counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x9);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Version number
@@ -1294,13 +1297,13 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout << BOLDBLUE << "Error Counters : " << RESET;
     std::cout << "Retrans pkg counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xc);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //FED CRC error
     std::cout << "FED CRC error counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xd);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     std::cout << BLUE << "Data transfer block status: " << RESET << std::endl;

@@ -22,7 +22,7 @@
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 4: FEROL-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
-        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 1 </Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
@@ -42,7 +42,7 @@
         <!--<Register name="pixfed_ctrl_regs.PACKET_NB">10</Register>-->
 
         <!--TTS CONFIG-->
-        <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 1 </Register>
         <Register name="pixfed_ctrl_regs.tts.event_cnt_check_valid"> 0 </Register>
         <Register name="pixfed_ctrl_regs.tts.timeout_value"> 255 </Register>
         <!--<Register name="pixfed_ctrl_regs.tts.evt_timeout_value.tbm_ch_00"> 255 </Register>-->
@@ -50,7 +50,11 @@
         <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 255</Register>
         <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 255 </Register>
         <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
-        <Register name="pixfed_ctrl_regs.tts.force_RDY"> 1 </Register>
+        <Register name="pixfed_ctrl_regs.tts.force_RDY"> 0 </Register>
+        <!--Mask operation for the TBM trailer (STATUS1) STATUS1(7:0) = [NoTokenPass - ResetTBM - ResetROC - SyncError - SyncTrigger - ClrTrigCnt - CalTrig - Stackful] Masked or not with trailer_status_mask1[7:0]-->
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask"> 0 </Register>
+        <!--Mask operation for the TBM trailer STATUS2 or ERR_BITS STATUS2(2:0) = [WrongNbOfROCs - AutoResetSent - PKAMReseSent] Masked or not with trailer_status_mask2(2:0)-->
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask2"> 0 </Register>
 
         <!--CLOCK-->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->

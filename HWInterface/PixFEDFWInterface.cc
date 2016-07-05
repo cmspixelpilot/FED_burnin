@@ -687,7 +687,39 @@ void PixFEDFWInterface::readErrorFIFO (bool pForce)
     std::cout << "ERROR Fifo content: " << std::endl;
 
     for (auto& cWord : cErrors)
-        std::cout << std::bitset<32> (cWord) << std::endl;
+    {
+        //std::cout << std::bitset<32> (cWord) << std::endl;
+        //std::cout << std::hex << cWord << std::endl;
+        prettypPrintErrors (cWord);
+    }
+}
+
+void PixFEDFWInterface::prettypPrintErrors (const uint32_t& cWord)
+{
+    uint32_t cChannel = (cWord & 0xFC000000) >> 26;
+    uint32_t cMarker = (cWord & 0x03E00000) >> 21;
+    uint32_t cL1Actr = (cWord & 0x001FE000) >> 13;
+    uint32_t cErrorWord = (cWord & 0x00000FFF);
+
+    std::cout << RED << std::dec << "Error: Channel " << cChannel  << " Marker " << cMarker << " L1ACtr " << cL1Actr;
+    //std::hex << " Word 0x" << cErrorWord << RESET << std::endl;
+
+    switch (cMarker)
+    {
+        case 29 :
+            std::cout << " TBM StackCtr / Channel Index " << (cWord & 0x0000003F);
+            break;
+
+        case 31:
+            std::cout << " TBM EventNumber " << (cWord & 0x000000FF);
+            break;
+
+        case 30:
+            std::cout << " TBM Trailer Status " << (cWord & 0x000000FF);
+            break;
+    }
+
+    std::cout << RESET << std::endl;
 }
 
 bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
@@ -910,7 +942,7 @@ void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
     {
         uint32_t cWord1 = (cWord >> 32) & 0xFFFFFFFF;
         uint32_t cWord2 = cWord & 0xFFFFFFFF;
-        std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
+        //std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
         //std::cout << std::hex << cWord << std::dec << std::endl;
     }
 

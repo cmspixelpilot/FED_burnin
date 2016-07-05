@@ -77,7 +77,7 @@ int main (int argc, char* argv[] )
             //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
             cSystemController.fFEDInterface->readFIFO1 (cFED);
             cSystemController.fFEDInterface->ReadData (cFED, 0 );
-            //cSystemController.fFEDInterface->readErrorFIFO (cFED, true);
+            cSystemController.fFEDInterface->readErrorFIFO (cFED, true);
         }
     }
 

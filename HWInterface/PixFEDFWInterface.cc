@@ -483,17 +483,27 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
     // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
-    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 320 );
-    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 320 );
+    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 2048 );
+    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 2048 );
 
     std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO A:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyA);
+    //uglyprintSpyFIFO (cSpyA);
     std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO B:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyB);
+    //uglyprintSpyFIFO (cSpyB);
     //append content of Spy Fifo B to A and return
     std::vector<uint32_t> cAppendedSPyFifo = cSpyA;
     //cAppendedSPyFifo.insert(cSpyA.end(), cSpyB.begin(), cSpyB.end());
     return cAppendedSPyFifo;
+}
+
+void PixFEDFWInterface::uglyprintSpyFIFO (const std::vector<uint32_t>& pVec)
+{
+    for (auto& cWord : pVec)
+    {
+        if (cWord != 0 ) std::cout << std::hex << "0x" << cWord << std::endl;
+    }
 }
 
 void PixFEDFWInterface::prettyprintSpyFIFO (const std::vector<uint32_t>& pVec)
@@ -506,13 +516,13 @@ void PixFEDFWInterface::prettyprintSpyFIFO (const std::vector<uint32_t>& pVec)
         {
             if ( (cWord & 0xff) != 0) std::cout << std::hex << (cWord & 0xff) << " " ;
 
-            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) ==  6 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  6 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) ==  7 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  7 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
         }
 
     }
@@ -553,25 +563,25 @@ void PixFEDFWInterface::prettyprintFIFO1 ( const std::vector<uint32_t>& pFifoVec
         if (pMarkerVec.at (cIndex) == 8)
         {
             // Event Header
-            os << RED << std::dec << "    Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex)  << RED << std::dec << "    Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at (cIndex) == 12)
-            os << std::dec << GREEN << "ROC Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex)  << std::dec << GREEN << "ROC Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
 
         if (pMarkerVec.at (cIndex) == 1)
-            os  << std::dec << "            CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f ) << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff ) <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
+            os  << std::hex << pFifoVec.at (cIndex) << std::dec << "            CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f ) << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff ) <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
 
         if (pMarkerVec.at (cIndex) == 4)
         {
             // TBM Trailer
-            os << std::dec << BLUE << "   Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_T2: " <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff ) << " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex) << std::dec << BLUE << "   Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_T2: " << std::hex <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff ) << " E2E1E0: " << ( (pFifoVec.at (cIndex) >> 9) & 0x7) <<  " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::dec << RESET << std::endl;
         }
 
         if (pMarkerVec.at (cIndex) == 6)
         {
             // Event Trailer
-            os << std::dec << RED << "Event Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex) << std::dec << RED << "Event Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
         }
     }
 
@@ -699,9 +709,9 @@ void PixFEDFWInterface::prettypPrintErrors (const uint32_t& cWord)
     uint32_t cChannel = (cWord & 0xFC000000) >> 26;
     uint32_t cMarker = (cWord & 0x03E00000) >> 21;
     uint32_t cL1Actr = (cWord & 0x001FE000) >> 13;
-    uint32_t cErrorWord = (cWord & 0x00000FFF);
+    uint32_t cErrorWord = (cWord & 0x00001FFF);
 
-    std::cout << RED << std::dec << "Error: Channel " << cChannel  << " Marker " << cMarker << " L1ACtr " << cL1Actr;
+    std::cout << RED << std::hex << cWord << std::dec << " Error: Channel " << cChannel  << " Marker " << cMarker << " L1ACtr " << cL1Actr;
     //std::hex << " Word 0x" << cErrorWord << RESET << std::endl;
 
     switch (cMarker)
@@ -715,7 +725,7 @@ void PixFEDFWInterface::prettypPrintErrors (const uint32_t& cWord)
             break;
 
         case 30:
-            std::cout << " TBM Trailer Status " << (cWord & 0x000000FF);
+            std::cout << std::hex << " ErrBits " << ( (cWord & 0xF00) >> 7) << " TBM Trailer Status " << (cWord & 0x000000FF);
             break;
     }
 
@@ -842,7 +852,6 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
 
     //poll for the selected DDR bank to be full
     uhal::ValWord<uint32_t> cVal;
-    std::cout << "I get stuck here " << fStrFull << std::endl;
 
     do
     {
@@ -852,7 +861,6 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     }
     while ( cVal == 0 );
 
-    std::cout << "Because I can not see this" << std::endl;
 
     if (fCalibMode == 1)
     {

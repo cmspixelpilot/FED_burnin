@@ -260,6 +260,7 @@ class PixFEDFWInterface : public RegManager
     uint32_t computeBlockSize (bool pFakeData = false);
 
     void prettyPrintTransparentFIFO (const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI);
+    void uglyprintSpyFIFO (const std::vector<uint32_t>& pVec);
     void prettyprintSpyFIFO (const std::vector<uint32_t>& pVec);
     void prettyprintFIFO1 ( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
     void prettyprintTBMFIFO (const std::vector<uint32_t>& pData);

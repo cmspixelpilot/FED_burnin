@@ -64,20 +64,23 @@ int main (int argc, char* argv[] )
     std::cout << "FED Configured, SLink Enabled, pressing Enter will send an EC0 & start periodic L1As" << std::endl;
     mypause();
     cAmc13Controller.fAmc13Interface->SendEC0();
-    cAmc13Controller.fAmc13Interface->StartL1A();
+    //    cAmc13Controller.fAmc13Interface->StartL1A();
 
     for (int i = 0; i < 11; i++)
     {
         for (auto& cFED : cSystemController.fPixFEDVector)
         {
+            cAmc13Controller.fAmc13Interface->BurstL1A();
+
             cSystemController.fFEDInterface->WriteBoardReg (cFED, "fe_ctrl_regs.decode_reg_reset", 1);
             mypause();
             //cSystemController.fFEDInterface->readTransparentFIFO(cFED);
             cSystemController.fFEDInterface->readSpyFIFO (cFED);
             //cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
             cSystemController.fFEDInterface->readFIFO1 (cFED);
-            cSystemController.fFEDInterface->ReadData (cFED, 0 );
             cSystemController.fFEDInterface->readErrorFIFO (cFED, true);
+            cSystemController.fFEDInterface->readTTSState (cFED); //returns byte with state
+            cSystemController.fFEDInterface->ReadData (cFED, 0 );
         }
     }
 

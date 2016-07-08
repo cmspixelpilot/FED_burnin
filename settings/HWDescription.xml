@@ -8,11 +8,11 @@
              on the TTCci - repeat is obvious, prescale is in orbits, the bx is selected such that it occurs 98 BX before the local
              L1A which is periodic at BX500 every orbit-->
         <!-- for the DEV lab setup in B186, the bx has to be 381 for the BU clock source and 380 for the TTCci as clock source -->
-        <BGO command="0x2c" repeat="1" prescale="0" bx="381" />
+        <BGO command="0x2c" repeat="1" prescale="0" bx="381" />  <!-- CAL-SYNC-Reset -->
         <!--<BGO command="0x2e" repeat="0" prescale="0" bx="0" />-->
         <!-- Local enables Local L1A, mode 0 means a trigger every orbit at BX500, rate is 1 for every orbit and burst is 1 
              for 1 trigger when sending burst (equivalent to single trigger -->
-        <Trigger local="1" mode="0" rate="1000" burst="1" rules="0" /> 
+        <Trigger local="1" mode="0" rate="1100" burst="1" rules="0" /> 
         <!--<Register tounge="T1" name="test.test">0</Register>-->
         <TTCSimulator>0</TTCSimulator>
     </AMC13>
@@ -22,9 +22,9 @@
         <!-- ACQUISITION MODE & CALIBRATION MODE & DATA TYPE -->
         <!--1: TBM fifo, 2: Slink FIFO, 4: FEROL-->
         <Register name="pixfed_ctrl_regs.acq_ctrl.acq_mode">2</Register>
-        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode"> 1 </Register>
         <!--this is 0-indexed so 9 will correspond to 10 events-->
-        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents"> 9 </Register>
+        <Register name="pixfed_ctrl_regs.acq_ctrl.calib_mode_NEvents">0</Register>
         <!--0: real data, 1: constants after TBM fifo, 2: pattern before TBM fifo-->
         <Register name="pixfed_ctrl_regs.data_type">0</Register>
 
@@ -43,18 +43,18 @@
 
         <!--TTS CONFIG-->
         <Register name="pixfed_ctrl_regs.tts.timeout_check_valid"> 1 </Register>
-        <Register name="pixfed_ctrl_regs.tts.event_cnt_check_valid"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tts.event_cnt_check_valid"> 1 </Register>
         <Register name="pixfed_ctrl_regs.tts.timeout_value"> 255 </Register>
         <!--<Register name="pixfed_ctrl_regs.tts.evt_timeout_value.tbm_ch_00"> 255 </Register>-->
         <!--<Register name="pixfed_ctrl_regs.tts.evt_timeout_value.tbm_ch_01"> 255 </Register>-->
-        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 255</Register>
+        <Register name="pixfed_ctrl_regs.tts.evt_err_nb_oos_thresh"> 2</Register>
         <Register name="pixfed_ctrl_regs.tts.timeout_nb_oos_thresh"> 255 </Register>
         <Register name="pixfed_ctrl_regs.tts.bc0_ec0_polar"> 0 </Register>
         <Register name="pixfed_ctrl_regs.tts.force_RDY"> 0 </Register>
         <!--Mask operation for the TBM trailer (STATUS1) STATUS1(7:0) = [NoTokenPass - ResetTBM - ResetROC - SyncError - SyncTrigger - ClrTrigCnt - CalTrig - Stackful] Masked or not with trailer_status_mask1[7:0]-->
-        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask"> 0xff </Register>
         <!--Mask operation for the TBM trailer STATUS2 or ERR_BITS STATUS2(2:0) = [WrongNbOfROCs - AutoResetSent - PKAMReseSent] Masked or not with trailer_status_mask2(2:0)-->
-        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask2"> 0 </Register>
+        <Register name="pixfed_ctrl_regs.tbm_trailer_status_mask2"> 0x7 </Register>
 
         <!--CLOCK-->
         <!--Used to set the CLK input to the TTC clock from the BP - 3 is XTAL, 0 is BP-->

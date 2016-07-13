@@ -343,7 +343,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
-    WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
+  //    WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
     //vectors to pass to the NRZI decoder as reference to be filled by that
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
@@ -606,7 +606,7 @@ bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
     cVecReg.push_back ( {"pixfed_ctrl_regs.PC_CONFIG_OK", 0} );
     std::cout << "PC_CONFIG_OK (0) in Configure" << std::endl;
     cVecReg.push_back( {"fe_ctrl_regs.fifo_config.overflow_value", 0x700e0}); // set 192val
-    cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.TBM_old_new", 0x1} ); // 0x1 = PSI46dig, 0x0 = PROC600              
+    cVecReg.push_back ( { "fe_ctrl_regs.fifo_config.TBM_old_new", 0x0} ); // 0x1 = PSI46dig, 0x0 = PROC600              
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR0_end_readout", 0} );
     cVecReg.push_back( {"pixfed_ctrl_regs.DDR1_end_readout", 0} );
 

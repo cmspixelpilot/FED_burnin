@@ -103,13 +103,13 @@ int main (int argc, char* argv[] )
     {
          for (auto& cFED : cSystemController.fPixFEDVector)
          {
-             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
+           //             cSystemController.fFEDInterface->WriteBoardReg(cFED, "fe_ctrl_regs.decode_reg_reset", 1);
              mypause();
              cSystemController.fFEDInterface->readTransparentFIFO(cFED);
              cSystemController.fFEDInterface->readSpyFIFO(cFED);
              cSystemController.fFEDInterface->readFIFO1(cFED);
              cSystemController.fFEDInterface->readOSDWord(cFED, cROCOfInterest, cChannelOfInterest);
-             cSystemController.fFEDInterface->ReadData(cFED, 0 );
+             //cSystemController.fFEDInterface->ReadData(cFED, 0 );
          }
     }
     

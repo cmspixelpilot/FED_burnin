@@ -36,7 +36,7 @@ class CtaFpgaConfig;
 class PixFEDFWInterface : public RegManager
 {
     //MEMBER VARIABLES
-private:
+  private:
     //Data* fData; [>!< Data read storage<]
 
     // Size Variables for Data to read
@@ -58,18 +58,18 @@ private:
     // strings fro DDR control
     std::string fStrDDR, fStrDDRControl, fStrFull, fStrReadout;
 
-public:
+  public:
     /*!
     * \brief Constructor of the PixFEDFWInterface class
     * \param puHalConfigFileName : path of the uHal Config File
     * \param pFileHandler : pointer to file handler for saving Raw Data*/
-    PixFEDFWInterface( const char* puHalConfigFileName, uint32_t pBoardId );
+    PixFEDFWInterface ( const char* puHalConfigFileName, uint32_t pBoardId );
     /*!
     * \brief Constructor of the PixFEDFWInterface class
     * \param pId : identifier string
     * \param pUri : URI string
     * \param pAddressTable: address table string*/
-    PixFEDFWInterface( const char* pId, const char* pUri, const char* pAddressTable );
+    PixFEDFWInterface ( const char* pId, const char* pUri, const char* pAddressTable );
     /*!
     * \brief Destructor of the PixFEDFWInterface class
     */
@@ -81,7 +81,7 @@ public:
      * \brief set the number of TBMs
      * \param pNTBM : number of TBMs connected
      */
-    void setNTBM(uint32_t pNTBM)
+    void setNTBM (uint32_t pNTBM)
     {
         fNTBM = pNTBM;
     };
@@ -89,7 +89,7 @@ public:
      * \brief set the blocksize for the FIFO (incl. TBM FIFO reads)
      * \param pBlockSize : number of 32 bit words to read from global TBM FIFO, all other FIFO depths are adapted correspondingly
      */
-    void setBlockSize(uint32_t pBlockSize)
+    void setBlockSize (uint32_t pBlockSize)
     {
         fBlockSize = pBlockSize;
         //fBlockSize32 = ceil(pBlockSize / double(8) ) - 1;
@@ -108,7 +108,7 @@ public:
     * \brief Configure the board with its Config File
     * \param pPixFED
     */
-    bool ConfigureBoard( const PixFED* pPixFED, bool pFakeData = false );
+    bool ConfigureBoard ( const PixFED* pPixFED, bool pFakeData = false );
     void setChannelOfInterest(uint32_t channel);
     /*!
      * \brief: Halt Board and put it back to safe state with internal Clock and golden Image FW
@@ -152,11 +152,15 @@ public:
      * \param: ROC Number
      * \return: the joined 16bit OSD words for both TBM cores A is bits [0:15], B is bits [16:31]
      */
-    uint32_t readOSDWord( uint32_t pROCId, uint32_t pScopeFIFOCh );
+    uint32_t readOSDWord ( uint32_t pROCId, uint32_t pScopeFIFOCh );
     /*!
      * \brief: Read the TTS State
      */
-    uint8_t readTTSState(); 
+    uint8_t readTTSState();
+    /*!
+     * \brief: read the Error FIFO
+     */
+    void readErrorFIFO (bool pForce);
     /*!
      * \brief Start a DAQ
      */
@@ -180,7 +184,7 @@ public:
      * \param pBreakTrigger : if true, enable the break trigger
      * \return vector<uint32_t> cData
      */
-    std::vector<uint32_t> ReadData( PixFED* pPixFED, uint32_t pBlockSize = 0 );
+    std::vector<uint32_t> ReadData ( PixFED* pPixFED, uint32_t pBlockSize = 0 );
     /*!
      * \brief Read data from Slink FIFO
      * \param pPixFED
@@ -193,8 +197,8 @@ public:
     //const Event* GetEvent( const PixFED* pPixFED, int i ) const;
     //const std::vector<Event*>& GetEvents( const PixFED* pPixFED ) const;
 
-    std::vector<uint32_t> ReadBlockRegValue( const std::string& pRegNode, const uint32_t& pBlocksize );
-    bool WriteBlockReg( const std::string& pRegNode, const std::vector< uint32_t >& pValues );
+    std::vector<uint32_t> ReadBlockRegValue ( const std::string& pRegNode, const uint32_t& pBlocksize );
+    bool WriteBlockReg ( const std::string& pRegNode, const std::vector< uint32_t >& pValues );
 
     //FITEL METHODS
 
@@ -205,14 +209,14 @@ public:
     * \param pFitelId : Id of the Fitel to work with
     * \param pVecReq : Vector to stack the encoded words
     */
-    void EncodeReg( const FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
+    void EncodeReg ( const FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pFitelId, std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Decode a word from a read of a register of the Fitel
     * \param pRegItem : RegItem containing infos (name, adress, value...) about the register to read
     * \param pFitelId : Id of the Fitel to work with
     * \param pWord : variable to put the decoded word
     */
-    void DecodeReg( FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pCFitelId, uint32_t pWord );
+    void DecodeReg ( FitelRegItem& pRegItem, uint8_t pFMCId, uint8_t pCFitelId, uint32_t pWord );
 
     //pure methods which are defined in the proper BoardFWInterface class
     //r/w the Fitel registers
@@ -220,72 +224,74 @@ public:
     * \brief Write register blocks of a Fitel
     * \param pVecReq : Block of words to write
     */
-    bool WriteFitelBlockReg( std::vector<uint32_t>& pVecReq );
+    bool WriteFitelBlockReg ( std::vector<uint32_t>& pVecReq );
     /*!
     * \brief Read register blocks of a Fitel
     * \param pVecReq : Vector to stack the read words
     */
-    bool ReadFitelBlockReg( std::vector<uint32_t>& pVecReq );
+    bool ReadFitelBlockReg ( std::vector<uint32_t>& pVecReq );
 
     /*!
      * \brief Read the ADC values for a given FITEL Receiver
      * \return Vector of 5 ADC values
      */
-    std::vector<double> ReadADC( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
+    std::vector<double> ReadADC ( const uint8_t pFMCId, const uint8_t pFitelId, bool pPrintAll);
 
     /*!
      * \brief Read and print the status of the SLINK
-     *  
+     *
      */
     void PrintSlinkStatus();
 
-private:
+  private:
     void getFEDNetworkParameters();
     /*!
      * \brief DDR selection for DAQ
      * \param pNthAcq : actual number of acquisitions
      */
-    void SelectDaqDDR( uint32_t pNthAcq );
+    void SelectDaqDDR ( uint32_t pNthAcq );
 
     //I2C Methods
-    void i2cRelease(uint32_t pTries);
-    bool polli2cAcknowledge(uint32_t pTries);
+    void i2cRelease (uint32_t pTries);
+    bool polli2cAcknowledge (uint32_t pTries);
 
     /*! Compute the size of an acquisition data block
      * \param pFakeData: boolean flag to determine whether deterministic fake data or not
      * \return Number of 32-bit words to be read at each iteration */
-    uint32_t computeBlockSize(bool pFakeData = false);
+    uint32_t computeBlockSize (bool pFakeData = false);
 
-void prettyPrintTransparentFIFO(const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI);
-    void prettyprintSpyFIFO(const std::vector<uint32_t>& pVec);
-    void prettyprintFIFO1( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
-    void prettyprintTBMFIFO(const std::vector<uint32_t>& pData);
-    void prettyprintSlink(const std::vector<uint64_t>& pData);
-    void prettyprintPhase( const std::vector<uint32_t>& pData, int pChannel );
+    void prettyPrintTransparentFIFO (const std::vector<uint32_t>& pFifoVec, const std::vector<uint8_t>& p5bSymbol, const std::vector<uint8_t>& p5bNRZI, const std::vector<uint8_t>& p4bNRZI);
+    void uglyprintSpyFIFO (const std::vector<uint32_t>& pVec);
+    void prettyprintSpyFIFO (const std::vector<uint32_t>& pVec);
+    void prettyprintFIFO1 ( const std::vector<uint32_t>& pFifoVec, const std::vector<uint32_t>& pMarkerVec, std::ostream& os = std::cout);
+    void prettyprintTBMFIFO (const std::vector<uint32_t>& pData);
+    void prettyprintSlink (const std::vector<uint64_t>& pData);
+    void prettyprintPhase ( const std::vector<uint32_t>& pData, int pChannel );
     void decode_symbols (const std::vector<uint32_t>& pInData, std::vector<uint8_t>& p5bSymbol, std::vector<uint8_t>& p5bNRZI, std::vector<uint8_t>& p4bNRZI);
+    void prettypPrintErrors (const uint32_t& cWord);
 
     // FPGA CONFIG METHODS
-public:
+  public:
     void checkIfUploading();
     /*! \brief Upload a firmware (FPGA configuration) from a file in MCS format into a given configuration
      * \param strConfig FPGA configuration name
      * \param pstrFile path to MCS file
      */
-    void FlashProm( const std::string& strConfig, const char* pstrFile );
+    void FlashProm ( const std::string& strConfig, const char* pstrFile );
     /*! \brief Jump to an FPGA configuration */
-    void JumpToFpgaConfig( const std::string& strConfig );
+    void JumpToFpgaConfig ( const std::string& strConfig );
     /*! \brief: download FPGA config file from CTA SD card */
-    void DownloadFpgaConfig( const std::string& strConfig, const std::string& strDest );
+    void DownloadFpgaConfig ( const std::string& strConfig, const std::string& strDest );
     /*! \brief Is the FPGA being configured ?
      * \return FPGA configuring process or NULL if configuration occurs */
     const FpgaConfig* getConfiguringFpga()
     {
-        return ( const FpgaConfig* )fpgaConfig;
+        return ( const FpgaConfig* ) fpgaConfig;
     }
     /*! \brief Get the list of available FPGA configuration (or firmware images)*/
     std::vector<std::string> getFpgaConfigList( );
     /*! \brief Delete one Fpga configuration (or firmware image)*/
-    void DeleteFpgaConfig( const std::string& strId );
+    void DeleteFpgaConfig ( const std::string& strId );
 };
 
 #endif

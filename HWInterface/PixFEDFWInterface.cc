@@ -343,7 +343,7 @@ void PixFEDFWInterface::getSFPStatus (uint8_t pFMCId)
 
 std::vector<uint32_t> PixFEDFWInterface::readTransparentFIFO()
 {
-  //    WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
+    //WriteReg ("fe_ctrl_regs.decode_reg_reset", 1);
     std::vector<uint32_t> cFifoVec = ReadBlockRegValue ( "fifo.bit_stream", 512 );
     //vectors to pass to the NRZI decoder as reference to be filled by that
     std::vector<uint8_t> c5bSymbol, c5bNRZI, c4bNRZI;
@@ -415,17 +415,27 @@ std::vector<uint32_t> PixFEDFWInterface::readSpyFIFO()
     // cSpyA = ReadBlockRegValue( "fifo.spy_A", fBlockSize / 2 );
     // cSpyB = ReadBlockRegValue( "fifo.spy_B", fBlockSize / 2 );
 
-    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 320 );
-    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 320 );
+    cSpyA = ReadBlockRegValue ( "fifo.spy_A", 2048 );
+    cSpyB = ReadBlockRegValue ( "fifo.spy_B", 2048 );
 
     std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO A:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyA);
+    //uglyprintSpyFIFO (cSpyA);
     std::cout << std::endl << BOLDBLUE << "TBM_SPY FIFO B:       timestamp" << RESET << std::endl;
     prettyprintSpyFIFO (cSpyB);
+    //uglyprintSpyFIFO (cSpyB);
     //append content of Spy Fifo B to A and return
     std::vector<uint32_t> cAppendedSPyFifo = cSpyA;
     //cAppendedSPyFifo.insert(cSpyA.end(), cSpyB.begin(), cSpyB.end());
     return cAppendedSPyFifo;
+}
+
+void PixFEDFWInterface::uglyprintSpyFIFO (const std::vector<uint32_t>& pVec)
+{
+    for (auto& cWord : pVec)
+    {
+        if (cWord != 0 ) std::cout << std::hex << "0x" << cWord << std::endl;
+    }
 }
 
 void PixFEDFWInterface::prettyprintSpyFIFO (const std::vector<uint32_t>& pVec)
@@ -438,13 +448,13 @@ void PixFEDFWInterface::prettyprintSpyFIFO (const std::vector<uint32_t>& pVec)
         {
             if ( (cWord & 0xff) != 0) std::cout << std::hex << (cWord & 0xff) << " " ;
 
-            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 11 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) ==  6 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  6 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) ==  7 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) ==  7 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
 
-            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << "       " << ( (cWord >> 20) & 0xfff) << std::endl;
+            if ( ( (cWord & cMask) >> 4) == 15 ) std::cout << "       " << std::dec << ( (cWord >> 20) & 0xfff) << std::endl;
         }
 
     }
@@ -485,41 +495,22 @@ void PixFEDFWInterface::prettyprintFIFO1 ( const std::vector<uint32_t>& pFifoVec
         if (pMarkerVec.at (cIndex) == 8)
         {
             // Event Header
-            os << RED << std::dec << "    Header: "
-               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
-               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
-               << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff )
-               << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex)  << RED << std::dec << "    Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_H: " <<  ( (pFifoVec.at (cIndex) >> 9) & 0xff ) << " EVT Nr: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
         }
 
         if (pMarkerVec.at (cIndex) == 12)
-            os << std::dec << GREEN << "ROC Header: "
-               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  )
-               << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
-               << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex)  << std::dec << GREEN << "ROC Header: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f  ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " Status: " << (  (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
 
         if (pMarkerVec.at (cIndex) == 1)
-            os  << std::dec << "            "
-                << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
-                << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
-                << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f )
-                << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff )
-                <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
+            os  << std::hex << pFifoVec.at (cIndex) << std::dec << "            CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ROC Nr: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " DC: " <<  ( (pFifoVec.at (cIndex) >> 16) & 0x1f ) << " PXL: " <<  ( (pFifoVec.at (cIndex) >> 8) & 0xff ) <<  " PH: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::endl;
 
         if (pMarkerVec.at (cIndex) == 4)
             // TBM Trailer
-            os << std::dec << BLUE << "   Trailer: "
-               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
-               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
-               << " TBM_T2: " <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff )
-               << " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex) << std::dec << BLUE << "   Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " TBM_T2: " << std::hex <<  ( (pFifoVec.at (cIndex) >> 12) & 0xff ) << " E2E1E0: " << ( (pFifoVec.at (cIndex) >> 9) & 0x7) <<  " TBM_T1: " <<  ( (pFifoVec.at (cIndex) ) & 0xff ) << std::dec << RESET << std::endl;
 
         if (pMarkerVec.at (cIndex) == 6)
             // Event Trailer
-            os << std::dec << RED << "Event Trailer: "
-               << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f )
-               << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f )
-               << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
+            os << std::hex << pFifoVec.at (cIndex) << std::dec << RED << "Event Trailer: " << "CH: " << ( (pFifoVec.at (cIndex) >> 26) & 0x3f ) << " ID: " <<  ( (pFifoVec.at (cIndex) >> 21) & 0x1f ) << " marker: " <<  ( (pFifoVec.at (cIndex) ) & 0x1fffff ) << RESET << std::endl;
     }
 
     os << "----------------------------------------------------------------------------------" << std::endl;
@@ -592,7 +583,81 @@ uint8_t PixFEDFWInterface::readTTSState()
             break;
     }
 
+    //uint32_t cTTSState = ReadReg ("pixfed_stat_regs.TTS_FSM_STAGE");
+    //uint32_t cDAQRdy = ReadReg ("pixfed_stat_regs.DAQ_FEROL_VALID");
+    //std::cout << std::hex << "TTS FSM STAGE: " << cTTSState << " DAQ_FEROL_VALID " << cDAQRdy << std::endl;
+
     return cWord;
+}
+
+
+void PixFEDFWInterface::readErrorFIFO (bool pForce)
+{
+    if (pForce)
+    {
+        std::cout << "Forcing read of ERROR Fifo!" << std::endl;
+        //first, enable the error fifo
+        WriteReg ("pixfed_ctrl_regs.error_fifo_force_read", 1);
+    }
+
+    //then poll for error fifo ready=1
+    while (ReadReg ("pixfed_stat_regs.error_fifo_read_rdy") != 1) usleep (100);
+
+    std::cout << "Error FIFO read ready =1! " << std::endl;
+
+    uint32_t cErrorWords = ReadReg ("pixfed_stat_regs.error_fifo_wr_data_count");
+    std::cout << "Error FIFO contains " << cErrorWords << " error words!" << std::endl;
+
+    //block read the error fifo with cErrorWords words
+    std::vector<uint32_t> cErrors = ReadBlockRegValue ("ERROR_fifo" , cErrorWords );
+
+    //done reading the error fifo
+    WriteReg ("pixfed_ctrl_regs.error_fifo_read_done", 1);
+
+    //then poll for error fifo ready = 0
+    while (ReadReg ("pixfed_stat_regs.error_fifo_read_rdy") = 1) usleep (100);
+
+    //release
+    WriteReg ("pixfed_ctrl_regs.error_fifo_read_done", 0);
+
+    if (pForce) WriteReg ("pixfed_ctrl_regs.error_fifo_force_read", 0);
+
+    std::cout << "ERROR Fifo content: " << std::endl;
+
+    for (auto& cWord : cErrors)
+    {
+        //std::cout << std::bitset<32> (cWord) << std::endl;
+        //std::cout << std::hex << cWord << std::endl;
+        prettypPrintErrors (cWord);
+    }
+}
+
+void PixFEDFWInterface::prettypPrintErrors (const uint32_t& cWord)
+{
+    uint32_t cChannel = (cWord & 0xFC000000) >> 26;
+    uint32_t cMarker = (cWord & 0x03E00000) >> 21;
+    uint32_t cL1Actr = (cWord & 0x001FE000) >> 13;
+    uint32_t cErrorWord = (cWord & 0x00001FFF);
+
+    std::cout << RED << std::hex << cWord << std::dec << " Error: Channel " << cChannel  << " Marker " << cMarker << " L1ACtr " << cL1Actr;
+    //std::hex << " Word 0x" << cErrorWord << RESET << std::endl;
+
+    switch (cMarker)
+    {
+        case 29 :
+            std::cout << " TBM StackCtr / Channel Index " << (cWord & 0x0000003F);
+            break;
+
+        case 31:
+            std::cout << " TBM EventNumber " << (cWord & 0x000000FF);
+            break;
+
+        case 30:
+            std::cout << std::hex << " ErrBits " << ( (cWord & 0xF00) >> 7) << " TBM Trailer Status " << (cWord & 0x000000FF);
+            break;
+    }
+
+    std::cout << RESET << std::endl;
 }
 
 bool PixFEDFWInterface::ConfigureBoard ( const PixFED* pPixFED, bool pFakeData )
@@ -729,6 +794,7 @@ std::vector<uint32_t> PixFEDFWInterface::ReadData ( PixFED* pPixFED, uint32_t pB
     }
     while ( cVal == 0 );
 
+
     if (fCalibMode == 1)
     {
         //I am in calibration mode and thus the FW gets to decide how many words to read and they come from DDR0!
@@ -817,7 +883,7 @@ void PixFEDFWInterface::prettyprintSlink (const std::vector<uint64_t>& pData )
     {
         uint32_t cWord1 = (cWord >> 32) & 0xFFFFFFFF;
         uint32_t cWord2 = cWord & 0xFFFFFFFF;
-        std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
+        //std::cout << std::hex << cWord1 << " " << cWord2 << std::dec << std::endl;
         //std::cout << std::hex << cWord << std::dec << std::endl;
     }
 
@@ -1030,7 +1096,7 @@ std::vector<double> PixFEDFWInterface::ReadADC ( const uint8_t pFMCId, const uin
     // the ADC always reads the sum of all the enabled channels!
     //initial FW setup
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 1);
-    sleep (0.5);
+    //sleep (0.5);
     WriteReg ("pixfed_ctrl_regs.fitel_i2c_cmd_reset", 0);
 
     std::vector<std::pair<std::string, uint32_t> > cVecReg;
@@ -1190,44 +1256,44 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout << BOLDBLUE << "Input Counters : " << RESET;
     std::cout << "Data counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x2);
-    uint64_t val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    uint64_t val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Event counter
     std::cout << "Event counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x3);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Block counter
     std::cout << "Block counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x4);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Packets recieved counter
     std::cout << "Pckt rcv counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x5);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Packets send counter
     std::cout << BOLDBLUE << "Output Counter : " << RESET;
     std::cout << "Pckt send counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x7);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Status build
     std::cout << "Status build: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x8);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //Back pressure counter
     std::cout << "BackP counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0x9);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     //Version number
@@ -1246,13 +1312,13 @@ void PixFEDFWInterface::PrintSlinkStatus()
     std::cout << BOLDBLUE << "Error Counters : " << RESET;
     std::cout << "Retrans pkg counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xc);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << " | ";
 
     //FED CRC error
     std::cout << "FED CRC error counter: ";
     WriteReg ("pixfed_ctrl_regs.slink_core_status_addr", 0xd);
-    val = ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
+    val = (uint64_t) ReadReg ("pixfed_stat_regs.slink_core_status.data_63to32") << 32 | ReadReg ("pixfed_stat_regs.slink_core_status.data_31to0");
     std::cout <<  val << std::endl;
 
     std::cout << BLUE << "Data transfer block status: " << RESET << std::endl;

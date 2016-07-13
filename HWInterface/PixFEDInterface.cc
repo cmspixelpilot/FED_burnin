@@ -599,7 +599,13 @@ uint8_t PixFEDInterface::readTTSState (const PixFED* pFED)
     return fFEDFW->readTTSState();
 }
 
-///////////////
+void PixFEDInterface::readErrorFIFO (const PixFED* pFED, bool pForce)
+{
+    setBoard (pFED->getBeId() );
+    fFEDFW->readErrorFIFO (pForce);
+}
+
+//////////////
 // Readout  Methods
 //////////////
 

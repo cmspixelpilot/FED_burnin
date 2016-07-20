@@ -11,3 +11,4 @@ logifle*
 *.txt
 *.*~
 .ycm_extra_conf.pyc
+src/pohbiasscan

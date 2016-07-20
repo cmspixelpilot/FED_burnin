@@ -76,6 +76,9 @@ int main (int argc, char* argv[] )
     {
         cSystemController.fFEDInterface->setChannelOfInterest(cFED, cChannelOfInterest);
         cSystemController.fFEDInterface->getBoardInfo(cFED);
+        if (dump_fitel_regs)
+          for (auto& cFitel : cFED->fFitelVector)
+            cSystemController.fFEDInterface->DumpFitelRegs(cFitel);
         if (do_phases) cSystemController.fFEDInterface->findPhases(cFED);
         if (phases_forever)
           while (true) {

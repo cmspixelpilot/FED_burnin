@@ -31,9 +31,6 @@ int main (int argc, char* argv[] )
     cSetting = cSystemController.fSettingsMap.find ("BlockSize");
     int cBlockSize = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 2;
 
-    cSetting = cSystemController.fSettingsMap.find ("ChannelOfInterest");
-    int cChannelOfInterest = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 0;
-
     cSetting = cSystemController.fSettingsMap.find ("ROCOfInterest");
     int cROCOfInterest = (cSetting != std::end (cSystemController.fSettingsMap) ) ? cSetting->second : 0;
 

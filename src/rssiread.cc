@@ -6,7 +6,6 @@
 #include "../HWDescription/PixFED.h"
 #include "../HWInterface/PixFEDInterface.h"
 #include "../System/SystemController.h"
-#include "../AMC13/Amc13Controller.h"
 #include "../Utils/Data.h"
 void mypause()
 {
@@ -45,17 +44,25 @@ int main (int argc, char* argv[] )
 
     // get the board info of all boards and start the acquistion
 
-    for (auto& cFED : cSystemController.fPixFEDVector)
-    {
-        cSystemController.fFEDInterface->setChannelOfInterest(cFED, cChannelOfInterest);
+    //1296 & 1300, 9-12,21-24   
+    int meas = 0;
+    while (1) {
+      for (auto& cFED : cSystemController.fPixFEDVector)
+        {
+          std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+          std::time_t end_time = std::chrono::system_clock::to_time_t(now);
+          std::cout << "measurement " << meas++ << " @ " << std::ctime(&end_time) << std::endl;
+          cSystemController.fFEDInterface->getBoardInfo (cFED);
+          for (auto& cFitel : cFED->fFitelVector)
+            for (uint32_t cChannel = 8; cChannel < 12; cChannel++)
+              cSystemController.fFEDInterface->ReadADC (cFitel, cChannel, true);
 
-        for (auto& cFitel : cFED->fFitelVector)
-            for (uint32_t cChannel = 0; cChannel < 12; cChannel++)
-                cSystemController.fFEDInterface->ReadADC (cFitel, cChannel, true);
 
-        cSystemController.fFEDInterface->getBoardInfo (cFED);
+          cSystemController.fFEDInterface->findPhases (cFED);
 
-        cSystemController.fFEDInterface->findPhases (cFED);
+        
+        }
+      sleep(30);
     }
 
     exit (0);
